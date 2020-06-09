@@ -19,7 +19,7 @@ HTTP: GET
 URL: /trips/station/{comma_separated_stationIds}
 Description: API to fetch trips for a given stationId(s) 
 
-All the above APIs take Authorization tokan which is OKTA Bearer token. Here is the CURL command to generate the Bearer token
+All the above APIs take Authorization token which is OKTA Bearer token. Here is the CURL command to generate the Bearer token
 
 ## Auth command
 ```
