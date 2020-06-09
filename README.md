@@ -1,6 +1,8 @@
 # divvy-api
-Station - Where the bikes can originate and end 
+Station - Where the bikes can originate and end
+ 
 Trip - the dates, times, station, and rider info 
+
 Rider - the person renting the bike
 
 ## API
