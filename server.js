@@ -59,19 +59,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var express = require("express");
-var request_promise_1 = __importDefault(require("request-promise"));
-var fs = __importStar(require("fs"));
 var csv = __importStar(require("fast-csv"));
+var fs = __importStar(require("fs"));
+var request_promise_1 = __importDefault(require("request-promise"));
+require('dotenv').config();
 var lodash = require('lodash');
+var app = express();
 var PORT = 8080;
 var tripData = [];
-var tripByStation = new Map();
 var STATIONINFOURL = "https://gbfs.divvybikes.com/gbfs/en/station_information.json";
-var app = express();
+var authMiddleware = require('./auth');
+/**
+ * bootstrap function
+ */
 app.listen(PORT, function () {
     console.log("App is listening on port " + PORT + "!");
     loadTripData();
 });
+app.use(authMiddleware);
+/**
+ * GET all station information
+ */
 app.get('/stationInfo', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var response, exception_1;
     return __generator(this, function (_a) {
@@ -96,6 +104,9 @@ app.get('/stationInfo', function (req, res) { return __awaiter(void 0, void 0, v
         }
     });
 }); });
+/**
+ * GET station information with stationId
+ */
 app.get('/stationInfo/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var stationId, stationInfo, stations, station, exception_2;
     return __generator(this, function (_a) {
@@ -129,6 +140,10 @@ app.get('/stationInfo/:id', function (req, res) { return __awaiter(void 0, void 
         }
     });
 }); });
+/**
+ * Test endpoint
+ * GET trip information with a line number
+ */
 app.get('/tripInfo/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var lineId;
     return __generator(this, function (_a) {
@@ -144,6 +159,9 @@ app.get('/tripInfo/:id', function (req, res) { return __awaiter(void 0, void 0, 
         return [2 /*return*/];
     });
 }); });
+/**
+ * GET trips for a given station id(s)
+ */
 app.get('/trips/station/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var stationId, stationIds, trips;
     return __generator(this, function (_a) {
@@ -160,6 +178,9 @@ app.get('/trips/station/:id', function (req, res) { return __awaiter(void 0, voi
         }
     });
 }); });
+/**
+ * GET riders count for a given station id(s)
+ */
 app.get('/riders/station/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var stationId, stationIds, trips, ridersByAgeGroup, result, exception_3;
     return __generator(this, function (_a) {
@@ -179,7 +200,6 @@ app.get('/riders/station/:id', function (req, res) { return __awaiter(void 0, vo
                     .map(function (value, key) { return ({ ageGroup: key, trips: value }); })
                     .value();
                 result = getRidersCount(ridersByAgeGroup);
-                // console.log(`Riders by age group: ${JSON.stringify(ridersByAgeGroup)}`)
                 res.status(200).send(result);
                 return [3 /*break*/, 4];
             case 3:
@@ -191,6 +211,9 @@ app.get('/riders/station/:id', function (req, res) { return __awaiter(void 0, vo
         }
     });
 }); });
+/**
+ * Utility function to build riders count trip response
+ */
 function getRidersCount(ridersByAgeGroup) {
     return ridersByAgeGroup.map(function (item) {
         return {
@@ -199,6 +222,10 @@ function getRidersCount(ridersByAgeGroup) {
         };
     });
 }
+/**
+ * Utility function to identify the rider's age group
+ * @param birthYear
+ */
 function getAgeGroup(birthYear) {
     // console.log(`getting age group for ${birthYear}`)
     var age = calculateRiderAge(birthYear);
@@ -221,6 +248,10 @@ function getAgeGroup(birthYear) {
         return 'unknown';
     }
 }
+/**
+ * Utility function to get trip information by station
+ * @param stationIds
+ */
 function getTripsByStation(stationIds) {
     return __awaiter(this, void 0, void 0, function () {
         var trips;
@@ -246,38 +277,17 @@ function getTripsByStation(stationIds) {
         });
     });
 }
-// async function mapTripsByRiders(trips: Trip[]) {
-//   let ridersMap = new Map();
-//   let arr20, arr30, arr40, arr50, arr51, unknown = []
-//   var result = new Map(trips.map(i => [i.key, i.val]));
-//   trips.map(async trip => {
-//     let age = calculateRiderAge(trip.birthYear);
-//     if (age > 0 && age < 21) {
-//       arr20.push(trip)
-//     } else if (age > 20 && age < 31) {
-//       arr30.push(trip)
-//     } else if (age > 30 && age < 41) {
-//       arr40.push(trip)
-//     } else if (age > 30 && age < 41) {
-//       arr40.push(trip)
-//     } else if (age > 40 && age < 51) {
-//       arr50.push(trip)
-//     } else if (age > 50) {
-//       arr51.push(trip)
-//     } else {
-//       unknown.push(trip)
-//     }
-//   })
-// }
-// function getCountByDate(trips: Trip[], ageGroup; string){
-//   let count=0
-//   trips.map(trip=>{
-//   });
-// }
+/**
+ * Utility function to calculate riders age from birthYear
+ * @param birthYear
+ */
 function calculateRiderAge(birthYear) {
     var currentYear = new Date().getFullYear();
     return currentYear - (+birthYear);
 }
+/**
+ * Function to read trip data from file
+ */
 function loadTripData() {
     console.log("Going to read trip information.... " + Date());
     try {
@@ -290,13 +300,16 @@ function loadTripData() {
             .on('end', function (rowCount) {
             console.log("Parsed " + rowCount + " rows");
             console.log("Trip data count " + tripData.length + " rows : " + Date());
-            // mapTripStation();
         }));
     }
     catch (exception) {
         process.stderr.write("ERROR reading trip information: " + exception + "\n");
     }
 }
+/**
+ * Function to map trip data line to custom object
+ * @param row
+ */
 function mapTripData(row) {
     var rentalIdIndex = Object.keys(row)[0];
     var startTimeIndex = Object.keys(row)[1];
@@ -326,35 +339,26 @@ function mapTripData(row) {
         ageGroup: getAgeGroup(row[birthYearIndex])
     };
 }
-function mapTripStation() {
-    return __awaiter(this, void 0, void 0, function () {
-        var _this = this;
-        return __generator(this, function (_a) {
-            console.log("Inside mapTripStation()...");
-            if (tripData && tripData.length > 0) {
-                console.log("trip data length is >0 and before creating trip by station map...");
-                Promise.all(tripData.map(function (trip) { return __awaiter(_this, void 0, void 0, function () {
-                    return __generator(this, function (_a) {
-                        if (tripByStation.has(trip.startStationId)) {
-                            //if data already exists in the map, add the new trip to existing value in the map
-                            tripByStation.set(trip.startStationId, tripByStation.get(trip.startStationId).push(trip));
-                        }
-                        else {
-                            //if data doesn't exist in the map, add the new trip to the map
-                            tripByStation.set(trip.startStationId, [trip]);
-                        }
-                        return [2 /*return*/];
-                    });
-                }); }));
-                console.log("after trip by stations: " + JSON.stringify(tripByStation.entries));
-            }
-            return [2 /*return*/];
-        });
-    });
-}
+// async function mapTripStation() {
+//   console.log(`Inside mapTripStation()...`)
+//   if (tripData && tripData.length > 0) {
+//     console.log(`trip data length is >0 and before creating trip by station map...`)
+//     Promise.all(tripData.map(async trip => {
+//       if (tripByStation.has(trip.startStationId)) {
+//         //if data already exists in the map, add the new trip to existing value in the map
+//         tripByStation.set(trip.startStationId, tripByStation.get(trip.startStationId).push(trip))
+//       } else {
+//         //if data doesn't exist in the map, add the new trip to the map
+//         tripByStation.set(trip.startStationId, [trip])
+//       }
+//     }));
+//     console.log(`after trip by stations: ${JSON.stringify(tripByStation.entries)}`)
+//   }
+// }
 function getStationInfo() {
     console.log("Inside getStatuinInfo");
     return request_promise_1.default.get(STATIONINFOURL, {
         json: true,
     });
 }
+module.exports = app;

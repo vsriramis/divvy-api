@@ -4,13 +4,14 @@ import * as fs from 'fs';
 import rp from "request-promise";
 import { Station, StationRes } from './src/model/StationData';
 import { Trip } from './src/model/TripData';
+require('dotenv').config()
 
 const lodash = require('lodash')
 const app: express.Application = express();
 const PORT = 8080;
 const tripData: any[] = []
 const STATIONINFOURL: string = `https://gbfs.divvybikes.com/gbfs/en/station_information.json`
-
+const authMiddleware = require('./auth')
 /**
  * bootstrap function
  */
@@ -18,6 +19,7 @@ app.listen(PORT, function () {
   console.log(`App is listening on port ${PORT}!`);
   loadTripData();
 });
+app.use(authMiddleware)
 
 /**
  * GET all station information
@@ -239,3 +241,5 @@ function getStationInfo() {
     json: true,
   });
 }
+
+module.exports = app;
