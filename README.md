@@ -3,7 +3,7 @@ Station - Where the bikes can originate and end
 Trip - the dates, times, station, and rider info 
 Rider - the person renting the bike
 
-API
+##API
 1. API to return the information for one station given a station id
 HTTP: GET
 URL: /stationInfo/{stationId}
@@ -21,6 +21,7 @@ Description: API to fetch trips for a given stationId(s)
 
 All the above APIs take Authorization tokan which is OKTA Bearer token. Here is the CURL command to generate the Bearer token
 
+##Auth command
 curl --location --request POST 'https://dev-864152.okta.com/oauth2/default/v1/token' \
 --header 'Accept: application/json' \
 --header 'Authorization: Basic MG9hZWZsYThsSjJFd2xSS3g0eDY6bDBsS2x4a3hFcnFaQk8zRGNOQjlCdEc3cmxOMms3eFpBQWs0cFVOSQ==' \
