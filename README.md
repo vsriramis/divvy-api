@@ -22,6 +22,7 @@ Description: API to fetch trips for a given stationId(s)
 All the above APIs take Authorization tokan which is OKTA Bearer token. Here is the CURL command to generate the Bearer token
 
 ## Auth command
+```
 curl --location --request POST 'https://dev-864152.okta.com/oauth2/default/v1/token' \
 --header 'Accept: application/json' \
 --header 'Authorization: Basic MG9hZWZsYThsSjJFd2xSS3g0eDY6bDBsS2x4a3hFcnFaQk8zRGNOQjlCdEc3cmxOMms3eFpBQWs0cFVOSQ==' \
@@ -29,3 +30,4 @@ curl --location --request POST 'https://dev-864152.okta.com/oauth2/default/v1/to
 --header 'Cookie: t=default; DT=DI0EOcw_WFwQTWDAK0rz1ktIw; JSESSIONID=0956D92A5AC292215D5DF5E3A1C98EC1' \
 --data-urlencode 'grant_type=client_credentials' \
 --data-urlencode 'scope=divvy-api'
+```
