@@ -1,0 +1,27 @@
+{
+  "name": "divvy-api",
+  "version": "1.0.0",
+  "description": "Divvy API",
+  "author": "Sriram Venkataraman<vsriramis@gmail.com>",
+  "main": "server.js",
+  "scripts": {
+    "start": "node --max-old-space-size=5120 server.js",
+    "tsc": "tsc"
+  },
+  "dependencies": {
+    "@fast-csv/format": "^4.3.0",
+    "@fast-csv/parse": "^4.3.0",
+    "@types/express": "^4.17.6",
+    "axios": "^0.19.2",
+    "express": "^4.17.1",
+    "fast-csv": "^4.3.0",
+    "fs": "0.0.1-security",
+    "lodash": "^4.17.15",
+    "request": "^2.88.2",
+    "request-promise": "^4.2.5",
+    "typescript": "^3.9.5"
+  },
+  "devDependencies": {
+    "@types/request-promise": "^4.1.46"
+  }
+}
